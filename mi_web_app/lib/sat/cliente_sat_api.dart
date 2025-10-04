@@ -57,38 +57,5 @@ class ClienteSATAPI {
       "expires_in": data["expires_in"],
     };
   }
- // validar 
- static Future<Map<String, dynamic>> validarCFDI({
-  required String rfcEmisor,
-  required String rfcReceptor,
-  required String uuid,
-  required double total,
-  required String token,
-}) async {
-  final endpoint = "$_baseUrl/POST/validarCFDI";
-  final body = {
-    "rfcEmisor": rfcEmisor,
-    "rfcReceptor": rfcReceptor,
-    "uuid": uuid,
-    "total": total,
-    "token": token,
-  };
-
-  final response = await ClienteSATCore.sendRequest(
-    endpoint: endpoint,
-    body: body,
-  );
-
-  ClienteSATCore.manejarErrores(response.statusCode, response.body);
-  final data = ClienteSATCore.parsearRespuesta(response.body);
-
-  return {
-    "estatus": data["estatus"],
-    "codigoEstatus": data["codigoEstatus"],
-    "esCancelable": data["esCancelable"],
-    "estatusCancelacion": data["estatusCancelacion"],
-  };
-}
-
 
 }
