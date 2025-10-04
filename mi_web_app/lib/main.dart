@@ -1,10 +1,7 @@
+// lib/main.dart
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'sat/cliente_sat_api.dart';
-// ✅ puedes dejarla sin problema
-
-
-
 
 void main() {
   runApp(const MyApp());
@@ -34,8 +31,8 @@ class SATDemoPage extends StatefulWidget {
 
 class _SATDemoPageState extends State<SATDemoPage> {
   String _resultado = "Presiona un botón para interactuar con el SAT.";
-  Map<String, dynamic>? _datos; // Muestra datos del JSON
-  String? _ultimoToken; // Guarda el token actual
+  Map<String, dynamic>? _datos;
+  String? _ultimoToken;
 
   // 🔴 Solicitar token
   Future<void> _solicitarTokenSAT() async {
@@ -159,7 +156,38 @@ class _SATDemoPageState extends State<SATDemoPage> {
     }
   }
 
-  // 🎨 Widget para mostrar los datos JSON
+  // ❌ Cancelar CFDI
+  Future<void> _cancelarCFDISAT() async {
+    if (_ultimoToken == null) {
+      setState(() {
+        _resultado = "⚠️ No hay token activo. Solicita o renueva uno antes.";
+      });
+      return;
+    }
+
+    setState(() {
+      _resultado = "Cancelando CFDI...";
+      _datos = null;
+    });
+
+    try {
+      final response = await ClienteSATAPI.cancelarCFDI(
+        uuid: "123e4567-e89b-12d3-a456-426614174000",
+        token: _ultimoToken!,
+      );
+
+      setState(() {
+        _resultado = "❌ CFDI cancelado correctamente.";
+        _datos = response;
+      });
+    } catch (e) {
+      setState(() {
+        _resultado = "🚫 Error al cancelar CFDI: $e";
+      });
+    }
+  }
+
+  // 🎨 Mostrar datos JSON formateados
   Widget _mostrarDatos() {
     if (_datos == null) return const SizedBox.shrink();
     return Container(
@@ -203,8 +231,7 @@ class _SATDemoPageState extends State<SATDemoPage> {
                 label: const Text("Solicitar Token al SAT"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   textStyle: const TextStyle(fontSize: 18),
                 ),
               ),
@@ -215,8 +242,7 @@ class _SATDemoPageState extends State<SATDemoPage> {
                 label: const Text("Renovar Token"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   textStyle: const TextStyle(fontSize: 18),
                 ),
               ),
@@ -227,8 +253,7 @@ class _SATDemoPageState extends State<SATDemoPage> {
                 label: const Text("Validar CFDI"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   textStyle: const TextStyle(fontSize: 18),
                 ),
               ),
@@ -239,8 +264,18 @@ class _SATDemoPageState extends State<SATDemoPage> {
                 label: const Text("Emitir CFDI (Timbrado)"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.teal,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: _cancelarCFDISAT,
+                icon: const Icon(Icons.cancel),
+                label: const Text("Cancelar CFDI"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   textStyle: const TextStyle(fontSize: 18),
                 ),
               ),

@@ -116,5 +116,32 @@ class ClienteSATAPI {
       "estatus": data["estatus"],
     };
   }
+ // 🔴 Cancelar CFDI
+  static Future<Map<String, dynamic>> cancelarCFDI({
+    required String uuid,
+    required String token,
+  }) async {
+    final endpoint = "$_baseUrl/POST/cancelarCFDI";
+    final body = {
+      "uuid": uuid,
+      "token": token,
+    };
 
+    final response = await ClienteSATCore.sendRequest(
+      endpoint: endpoint,
+      body: body,
+    );
+
+    ClienteSATCore.manejarErrores(response.statusCode, response.body);
+    final data = ClienteSATCore.parsearRespuesta(response.body);
+
+    return {
+      "uuid": data["uuid"],
+      "estatusCancelacion": data["estatusCancelacion"],
+      "fechaCancelacion": data["fechaCancelacion"],
+      "codigoSAT": data["codigoSAT"],
+      "mensaje": data["mensaje"],
+    };
+  }
+  
 }

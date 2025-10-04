@@ -77,5 +77,23 @@ class ClienteSAT {
       debugPrint("❌ Error al emitir CFDI: $e");
     }
   }
+  // ❌ Cancelar CFDI (demo)
+  static Future<void> cancelarCFDIDemo({required String token}) async {
+    try {
+      final response = await ClienteSATAPI.cancelarCFDI(
+        uuid: "123e4567-e89b-12d3-a456-426614174000",
+        token: token,
+      );
+
+      debugPrint("❌ CFDI cancelado correctamente:");
+      debugPrint("UUID: ${response['uuid']}");
+      debugPrint("Estatus: ${response['estatusCancelacion']}");
+      debugPrint("Fecha: ${response['fechaCancelacion']}");
+      debugPrint("Código SAT: ${response['codigoSAT']}");
+      debugPrint("Mensaje: ${response['mensaje']}");
+    } catch (e) {
+      debugPrint("🚫 Error al cancelar CFDI: $e");
+    }
+  }
 
 }
