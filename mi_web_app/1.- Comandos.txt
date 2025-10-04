@@ -1,0 +1,32 @@
+ubicarse en carpeta donde esta el proyecto
+flutter create mi_web_app   crear proyecto
+
+---------------------CORRER------------------------------
+flutter run -d chrome       // ejecutar server web
+flutter run -d web-server   levanta un webserver
+
+--------------------DEPENDENCIAS-------------------------------
+flutter pub get               copilar dependencias
+flutter pub outdated          version nuevas
+flutter pub get --verbose      Copilar paso a paso
+
+
+----------------COPILOT----------------------------------
+Shit + Control + p
+github copilot: Disable
+
+
+---------------COPILAR------------------------------------
+flutter build web --release
+
+----------------SNIPET--------------------------------------
+Preferences: Configure User Snippets
+Control + espacio  // Abre spinet
+
+
+
+3. Comandos en la paleta (Ctrl+Shift+P)
+“Copilot: Chat” para abrir el chat.
+“Copilot: Explain this code” para obtener explicaciones de código seleccionado.
+“Copilot: Generate tests” para crear pruebas automáticamente.
+“Copilot: Fix this code” para sugerir correcciones.
