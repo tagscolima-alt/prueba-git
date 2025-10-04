@@ -1,7 +1,10 @@
-// lib/main.dart
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'sat/cliente_sat.dart'; // Importa tu módulo SAT
-import 'sat/cliente_sat_api.dart'; // Necesario para las llamadas directas
+import 'sat/cliente_sat_api.dart';
+// ✅ puedes dejarla sin problema
+
+
+
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +19,6 @@ class MyApp extends StatelessWidget {
       title: 'Cliente SAT Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
       ),
       home: const SATDemoPage(),
     );
@@ -32,8 +34,8 @@ class SATDemoPage extends StatefulWidget {
 
 class _SATDemoPageState extends State<SATDemoPage> {
   String _resultado = "Presiona un botón para interactuar con el SAT.";
-  Map<String, dynamic>? _datos; // 🔹 Aquí guardamos la respuesta JSON
-  String? _ultimoToken; // guarda el token actual
+  Map<String, dynamic>? _datos; // Muestra datos del JSON
+  String? _ultimoToken; // Guarda el token actual
 
   // 🔴 Solicitar token
   Future<void> _solicitarTokenSAT() async {
@@ -43,16 +45,16 @@ class _SATDemoPageState extends State<SATDemoPage> {
     });
 
     try {
-      final tokenResponse = await ClienteSATAPI.solicitarToken(
+      final response = await ClienteSATAPI.solicitarToken(
         rfc: "AAA010101AAA",
         password: "123456",
         certificado: "BASE64_CERT",
       );
 
       setState(() {
-        _resultado = "✅ Token obtenido correctamente.";
-        _datos = tokenResponse;
-        _ultimoToken = tokenResponse["access_token"];
+        _resultado = "✅ Token solicitado correctamente.";
+        _datos = response;
+        _ultimoToken = response["access_token"];
       });
     } catch (e) {
       setState(() {
@@ -76,8 +78,10 @@ class _SATDemoPageState extends State<SATDemoPage> {
     });
 
     try {
-      final response =
-          await ClienteSATAPI.renovarToken(refreshToken: _ultimoToken!);
+      final response = await ClienteSATAPI.renovarToken(
+        refreshToken: _ultimoToken!,
+      );
+
       setState(() {
         _resultado = "🔁 Token renovado correctamente.";
         _datos = response;
@@ -109,7 +113,7 @@ class _SATDemoPageState extends State<SATDemoPage> {
         rfcEmisor: "AAA010101AAA",
         rfcReceptor: "BBB010101BBB",
         uuid: "123e4567-e89b-12d3-a456-426614174000",
-        total: 1234.56,
+        total: 1000.00,
         token: _ultimoToken!,
       );
 
@@ -124,28 +128,51 @@ class _SATDemoPageState extends State<SATDemoPage> {
     }
   }
 
-  // 🔹 Widget para mostrar datos JSON en pantalla
-  Widget _buildJsonViewer() {
+  // 🟢 Emitir CFDI (Timbrado)
+  Future<void> _emitirCFDISAT() async {
+    if (_ultimoToken == null) {
+      setState(() {
+        _resultado = "⚠️ No hay token activo. Solicita o renueva uno antes.";
+      });
+      return;
+    }
+
+    setState(() {
+      _resultado = "Enviando CFDI al SAT...";
+      _datos = null;
+    });
+
+    try {
+      final response = await ClienteSATAPI.emitirCFDI(
+        xmlFirmado: "<Comprobante>...</Comprobante>",
+        token: _ultimoToken!,
+      );
+
+      setState(() {
+        _resultado = "✅ CFDI emitido correctamente (Timbrado).";
+        _datos = response;
+      });
+    } catch (e) {
+      setState(() {
+        _resultado = "❌ Error al emitir CFDI: $e";
+      });
+    }
+  }
+
+  // 🎨 Widget para mostrar los datos JSON
+  Widget _mostrarDatos() {
     if (_datos == null) return const SizedBox.shrink();
     return Container(
       margin: const EdgeInsets.only(top: 20),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[400]!),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade400),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: _datos!.entries.map((entry) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Text(
-              "${entry.key}: ${entry.value}",
-              style: const TextStyle(fontSize: 16, fontFamily: "Courier"),
-            ),
-          );
-        }).toList(),
+      child: Text(
+        const JsonEncoder.withIndent('  ').convert(_datos),
+        style: const TextStyle(fontFamily: 'Courier', fontSize: 14),
       ),
     );
   }
@@ -158,7 +185,7 @@ class _SATDemoPageState extends State<SATDemoPage> {
         backgroundColor: Colors.deepPurple,
       ),
       body: Center(
-        child: SingleChildScrollView(
+        child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -168,8 +195,8 @@ class _SATDemoPageState extends State<SATDemoPage> {
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 18),
               ),
-              _buildJsonViewer(),
-              const SizedBox(height: 30),
+              _mostrarDatos(),
+              const SizedBox(height: 40),
               ElevatedButton.icon(
                 onPressed: _solicitarTokenSAT,
                 icon: const Icon(Icons.cloud),
@@ -200,6 +227,18 @@ class _SATDemoPageState extends State<SATDemoPage> {
                 label: const Text("Validar CFDI"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: _emitirCFDISAT,
+                icon: const Icon(Icons.send),
+                label: const Text("Emitir CFDI (Timbrado)"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   textStyle: const TextStyle(fontSize: 18),

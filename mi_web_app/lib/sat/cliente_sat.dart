@@ -58,4 +58,24 @@ class ClienteSAT {
       debugPrint("❌ Error al validar CFDI: $e");
     }
   }
+
+    // 🧾 Emitir CFDI (demo)
+  static Future<void> emitirCFDIDemo({required String token}) async {
+    try {
+      final response = await ClienteSATAPI.emitirCFDI(
+        xmlFirmado: "<Comprobante>...</Comprobante>",
+        token: token,
+      );
+
+      debugPrint("🧾 CFDI timbrado correctamente:");
+      debugPrint("UUID: ${response['uuid']}");
+      debugPrint("Fecha timbrado: ${response['fechaTimbrado']}");
+      debugPrint("RFC Prov. Certif.: ${response['rfcProvCertif']}");
+      debugPrint("Sello SAT: ${response['selloSAT']}");
+      debugPrint("Estatus: ${response['estatus']}");
+    } catch (e) {
+      debugPrint("❌ Error al emitir CFDI: $e");
+    }
+  }
+
 }

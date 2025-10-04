@@ -88,4 +88,33 @@ class ClienteSATAPI {
       "estatusCancelacion": data["estatusCancelacion"],
     };
   }
+
+    // 🟢 Emitir CFDI (Timbrado)
+  static Future<Map<String, dynamic>> emitirCFDI({
+    required String xmlFirmado,
+    required String token,
+  }) async {
+    final endpoint = "$_baseUrl/POST/emitirCFDI";
+    final body = {
+      "xmlFirmado": xmlFirmado,
+      "token": token,
+    };
+
+    final response = await ClienteSATCore.sendRequest(
+      endpoint: endpoint,
+      body: body,
+    );
+
+    ClienteSATCore.manejarErrores(response.statusCode, response.body);
+    final data = ClienteSATCore.parsearRespuesta(response.body);
+
+    return {
+      "uuid": data["uuid"],
+      "fechaTimbrado": data["fechaTimbrado"],
+      "rfcProvCertif": data["rfcProvCertif"],
+      "selloSAT": data["selloSAT"],
+      "estatus": data["estatus"],
+    };
+  }
+
 }
