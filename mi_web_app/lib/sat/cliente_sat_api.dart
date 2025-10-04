@@ -4,8 +4,7 @@ class ClienteSATAPI {
   static const String _baseUrl =
       "https://31a285aa-ccaf-4365-8f48-b09457f9600a.mock.pstmn.io";
 
-
-//Solicitar token
+  // 🔴 Solicitar token
   static Future<Map<String, dynamic>> solicitarToken({
     required String rfc,
     required String password,
@@ -33,8 +32,7 @@ class ClienteSATAPI {
     };
   }
 
-  /// 🟠 renovarToken(token)
-  /// 📌 Solicita un nuevo token cuando el actual expira.
+  /// 🟠 Renovar Token
   static Future<Map<String, dynamic>> renovarToken({
     required String refreshToken,
   }) async {
@@ -58,4 +56,36 @@ class ClienteSATAPI {
     };
   }
 
+  // 🧾 Validar CFDI
+  static Future<Map<String, dynamic>> validarCFDI({
+    required String rfcEmisor,
+    required String rfcReceptor,
+    required String uuid,
+    required double total,
+    required String token,
+  }) async {
+    final endpoint = "$_baseUrl/POST/validarCFDI";
+    final body = {
+      "rfcEmisor": rfcEmisor,
+      "rfcReceptor": rfcReceptor,
+      "uuid": uuid,
+      "total": total.toString(), // 🔹 convertido a string
+      "token": token,
+    };
+
+    final response = await ClienteSATCore.sendRequest(
+      endpoint: endpoint,
+      body: body,
+    );
+
+    ClienteSATCore.manejarErrores(response.statusCode, response.body);
+    final data = ClienteSATCore.parsearRespuesta(response.body);
+
+    return {
+      "estatus": data["estatus"],
+      "codigoEstatus": data["codigoEstatus"],
+      "esCancelable": data["esCancelable"],
+      "estatusCancelacion": data["estatusCancelacion"],
+    };
+  }
 }
