@@ -18,6 +18,8 @@ dependencies:
   # 🔹 Íconos estilo iOS (opcional)
   cupertino_icons: ^1.0.8
   postgres: ^2.6.1
+  pdf: ^3.10.7
+  intl: ^0.19.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
