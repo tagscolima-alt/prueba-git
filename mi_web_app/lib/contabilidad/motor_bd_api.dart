@@ -1,5 +1,5 @@
 // lib/contabilidad/motor_bd_api.dart
-import 'motor_bd_core.dart';
+import 'motor_bd_cores.dart';
 
 class MotorBDAPI {
   // 🔹 Inserta un registro en una tabla
