@@ -1,25 +1,22 @@
+import 'motor_bd_core.dart';
 
-
-import '../facturacion/emisor_factura.dart';  // ✅ apunta a la carpeta correcta
-import 'cliente_sat/cliente_sat.dart';        // ✅ apunta al cliente SAT
-
-void main() async {
+Future<void> main() async {
   print("============================================");
   print("🚀 PRUEBA LÓGICA LOCAL - ERP SAT");
   print("============================================");
+  print("🧾 Iniciando emisión de CFDI demo...");
 
   try {
-    // 1️⃣ Prueba local (emisor de facturas)
-    await EmisorFactura.emitirDemo();
+    await MotorBDCore.abrirConexion();
 
-    // 2️⃣ Prueba con el backend SAT
-    print("\n============================================");
-    print("🧩 Prueba de conexión con backend SAT");
-    print("============================================");
+    // ✅ Consulta simple sin errores de sintaxis
+    final result = await MotorBDCore.ejecutarSQL("SELECT current_database(), current_user, NOW();");
 
-    final cliente = ClienteSAT();
-    await cliente.probarFlujoCompleto();
+    print("✅ Conectado a base: ${result.first['current_database']}");
+    print("👤 Usuario: ${result.first['current_user']}");
+    print("🕒 Hora actual: ${result.first['now']}");
 
+    await MotorBDCore.cerrarConexion();
   } catch (e) {
     print("❌ Error en prueba: $e");
   }

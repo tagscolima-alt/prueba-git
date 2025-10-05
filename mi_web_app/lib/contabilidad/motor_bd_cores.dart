@@ -9,7 +9,7 @@ class MotorBDCore {
     _conexion ??= PostgreSQLConnection(
       'localhost', // ⚙️ Cambia según tu configuración
       5432,
-      'mi_base_datos',
+      'erpsat',
       username: 'postgres',
       password: '123456',
     );
