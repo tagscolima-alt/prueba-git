@@ -4,8 +4,8 @@ import 'cliente_sat_models.dart';
 import 'cliente_sat_core.dart';
 
 class ClienteSATApi {
-  final String baseUrl = 'http://localhost:3000/api/sat/cfdi';
-
+  //final String baseUrl = 'http://localhost:3000/api/sat/cfdi';
+  final String baseUrl = 'http://192.168.1.99:3000/api/sat/cfdi';
   Future<TokenResponse> solicitarToken(SolicitarTokenRequest request) async {
     final url = Uri.parse('$baseUrl/token');
     final response = await http.post(url,

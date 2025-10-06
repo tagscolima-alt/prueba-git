@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mi_web_app/pages/sat_dashboard_page.dart';
 import 'services/sat_api_service.dart';
+import 'pages/sat_dashboard_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +15,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ERP SAT Demo',
       debugShowCheckedModeBanner: false,
-      home: const SatTestScreen(),
+      //home: const SatTestScreen(),
+      home:  SatDashboardPage(),
+      
     );
   }
 }
