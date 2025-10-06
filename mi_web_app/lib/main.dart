@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mi_web_app/pages/sat_dashboard_page.dart';
-import 'services/sat_api_service.dart';
-import 'pages/sat_dashboard_page.dart';
+import 'pages/login_page.dart'; // 👈 Importamos la nueva pantalla de login
 
 void main() {
   runApp(const MyApp());
@@ -13,64 +11,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ERP SAT Demo',
+      title: 'ERP SAT',
       debugShowCheckedModeBanner: false,
-      //home: const SatTestScreen(),
-      home:  SatDashboardPage(),
-      
-    );
-  }
-}
-
-class SatTestScreen extends StatefulWidget {
-  const SatTestScreen({super.key});
-
-  @override
-  State<SatTestScreen> createState() => _SatTestScreenState();
-}
-
-class _SatTestScreenState extends State<SatTestScreen> {
-  String resultado = 'Presiona el botón para probar conexión';
-
-  Future<void> _probarConexion() async {
-    setState(() => resultado = '⏳ Probando conexión...');
-    try {
-      final datos = await SatApiService.probarConexionBD();
-      setState(() => resultado = '''
-✅ Conexión: ${datos['conexion']}
-🧠 Base: ${datos['baseDatos']}
-👤 Usuario: ${datos['usuario']}
-🕒 Hora servidor: ${datos['horaServidor']}
-''');
-    } catch (e) {
-      setState(() => resultado = '❌ Error: $e');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Prueba de conexión SAT')),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                resultado,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _probarConexion,
-                child: const Text('Probar conexión'),
-              ),
-            ],
-          ),
-        ),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+        useMaterial3: true,
       ),
+      home: const LoginPage(), // 👈 Ahora el login será la primera pantalla
     );
   }
 }
