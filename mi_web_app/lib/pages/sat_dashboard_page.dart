@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../services/auth_service.dart';
+import '../pages/login_page.dart';
 import '../sat/cliente_sat/cliente_sat_api.dart';
 import '../sat/cliente_sat/cliente_sat_models.dart';
-import '../sat/cliente_sat/cliente_sat_cancelar.dart'; // 👈 Import añadido
+import '../sat/cliente_sat/cliente_sat_cancelar.dart';
 
 class SatDashboardPage extends StatefulWidget {
   const SatDashboardPage({super.key});
@@ -15,6 +18,24 @@ class _SatDashboardPageState extends State<SatDashboardPage> {
 
   String resultado = "Selecciona una acción para interactuar con el SAT";
   String? tokenActual;
+  String? nombreUsuario;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarUsuario();
+  }
+
+  Future<void> _cargarUsuario() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userData = prefs.getString('usuario');
+    if (userData != null) {
+      final userMap = Map<String, dynamic>.from(await AuthService.getSession() ?? {});
+      setState(() {
+        nombreUsuario = userMap['usuario']?['nombre'] ?? 'Usuario';
+      });
+    }
+  }
 
   // 🔑 Solicitar Token SAT
   Future<void> solicitarToken() async {
@@ -124,7 +145,6 @@ class _SatDashboardPageState extends State<SatDashboardPage> {
                     uuidCtrl.text.trim(),
                     motivoCtrl.text.trim(),
                   );
-                  // ✅ Actualizar automáticamente la lista tras cancelación
                   final lista = await api.listarCFDIs();
                   setState(() => resultado = '''
 ✅ ${r['mensaje']}
@@ -148,16 +168,42 @@ ${lista.take(5).map((c) => "• ${c.uuid} — ${c.estatus}").join("\n")}
     );
   }
 
+  // 🔒 Cerrar sesión
+  Future<void> cerrarSesion() async {
+    await AuthService.logout();
+    if (context.mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+        (route) => false,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('ERP-SAT - ClienteSAT')),
+      appBar: AppBar(
+        title: Text('ERP-SAT - ${nombreUsuario ?? "ClienteSAT"}'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Cerrar sesión',
+            onPressed: cerrarSesion,
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(resultado, textAlign: TextAlign.left),
+            Text(
+              nombreUsuario != null
+                  ? '👋 Bienvenido, $nombreUsuario\n\n$resultado'
+                  : resultado,
+              textAlign: TextAlign.left,
+            ),
             const SizedBox(height: 30),
             ElevatedButton.icon(
               onPressed: solicitarToken,
@@ -185,4 +231,3 @@ ${lista.take(5).map((c) => "• ${c.uuid} — ${c.estatus}").join("\n")}
     );
   }
 }
-

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'pages/login_page.dart'; // 👈 Importamos la nueva pantalla de login
+import 'package:shared_preferences/shared_preferences.dart';
+import 'pages/login_page.dart';
+import 'pages/sat_dashboard_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,16 +10,25 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  Future<bool> verificarSesion() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token') != null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ERP SAT',
+      title: 'ERP SAT Demo',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        useMaterial3: true,
+      home: FutureBuilder<bool>(
+        future: verificarSesion(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          return snapshot.data! ? const SatDashboardPage() : const LoginPage();
+        },
       ),
-      home: const LoginPage(), // 👈 Ahora el login será la primera pantalla
     );
   }
 }
